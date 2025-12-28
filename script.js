@@ -1,7 +1,4 @@
-/* Git-Archive
-   Premium Developer Reference
-   Data Source: "GIT COMPLETE COMMAND LIST"
-*/
+/* Git-Archive Data & Logic */
 
 const gitData = [
     {
@@ -12,15 +9,34 @@ const gitData = [
             { cmd: 'git config --global user.email "email"', desc: "Set your Git email for commits" },
             { cmd: 'git config --global core.editor code', desc: "Set VS Code as default editor" },
             { cmd: 'git config --global init.defaultBranch main', desc: "Set default branch name to 'main'" },
-            { cmd: 'git config --list', desc: "Show all configuration settings" },
-            { cmd: 'git help <command>', desc: "Get help for a specific command" }
+            { cmd: 'git config --list', desc: "Show all configuration settings" }
+        ]
+    },
+    {
+        category: "🚀 How to Send Project to GitHub",
+        icon: "fa-rocket",
+        commands: [
+            { cmd: 'git init', desc: "Creates a new Git repository" },
+            { cmd: 'git add .', desc: "Adds all files to staging" },
+            { cmd: 'git commit -m "Initial commit"', desc: "Saves your changes" },
+            { cmd: 'git remote add origin https://github.com/USER/REPO.git', desc: "Connects local repo to GitHub" },
+            { cmd: 'git remote -v', desc: "Confirms GitHub connection" },
+            { cmd: 'git branch -M main', desc: "Sets branch name to main" },
+            { cmd: 'git push -u origin main', desc: "Uploads project to GitHub" },
+            { cmd: 'git add .', desc: "Stage new changes" },
+            { cmd: 'git commit -m "update"', desc: "Save new changes" },
+            { cmd: 'git push', desc: "Send updates to GitHub" }
+        ],
+        troubleshooting: [
+            { problem: "Remote has files", fix: "git pull origin main --allow-unrelated-histories" },
+            { problem: "Wrong branch name", fix: "git branch -M main" },
+            { problem: "Permission error", fix: "Check GitHub login / token" }
         ]
     },
     {
         category: "Create / Clone",
         icon: "fa-plus-square",
         commands: [
-            { cmd: 'git init', desc: "Initialize a new Git repository" },
             { cmd: 'git clone <url>', desc: "Clone a remote repository" },
             { cmd: 'git clone <url> folder', desc: "Clone into a specific folder name" },
             { cmd: 'git clone -b branch <url>', desc: "Clone a specific branch only" },
@@ -32,10 +48,10 @@ const gitData = [
         icon: "fa-camera",
         commands: [
             { cmd: 'git status', desc: "Check status of working directory" },
-            { cmd: 'git add .', desc: "Stage all changes" },
             { cmd: 'git add file', desc: "Stage a specific file" },
-            { cmd: 'git commit -m \"msg\"', desc: "Commit staged changes with message" },
-            { cmd: 'git commit --amend', desc: "Modify the previous commit" }
+            { cmd: 'git commit --amend', desc: "Modify the previous commit" },
+            { cmd: 'git diff', desc: "Show unstaged changes" },
+            { cmd: 'git diff --staged', desc: "Show staged changes" }
         ]
     },
     {
@@ -53,11 +69,8 @@ const gitData = [
         category: "Remote & Sync",
         icon: "fa-cloud",
         commands: [
-            { cmd: 'git remote -v', desc: "List remote connections" },
             { cmd: 'git fetch', desc: "Download changes (no merge)" },
-            { cmd: 'git pull', desc: "Fetch and merge changes" },
-            { cmd: 'git push', desc: "Upload commits to remote" },
-            { cmd: 'git push -u origin main', desc: "Push and set upstream tracking" }
+            { cmd: 'git pull', desc: "Fetch and merge changes" }
         ]
     },
     {
@@ -78,8 +91,7 @@ const gitData = [
             { cmd: 'git stash', desc: "Save uncommitted changes temporarily" },
             { cmd: 'git stash pop', desc: "Apply and delete latest stash" },
             { cmd: 'git log --oneline --graph', desc: "View clean history graph" },
-            { cmd: 'git cherry-pick <commit>', desc: "Apply a commit from another branch" },
-            { cmd: 'git bisect start', desc: "Start binary search for bugs" }
+            { cmd: 'git cherry-pick <commit>', desc: "Apply a commit from another branch" }
         ]
     }
 ];
@@ -92,16 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
     setupScrollReveal();
 });
 
-// --- 1. Loader Animation ---
+// --- Loader ---
 function initLoader() {
     const loader = document.getElementById('loader');
     setTimeout(() => {
-        loader.style.opacity = '0';
-        loader.style.visibility = 'hidden';
+        if(loader) {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+        }
     }, 1500); 
 }
 
-// --- 2. Rendering ---
+// --- Render Content ---
 function renderContent() {
     const grid = document.getElementById('commandGrid');
     const catList = document.getElementById('categoryList');
@@ -111,22 +125,25 @@ function renderContent() {
     grid.innerHTML = '';
     catList.innerHTML = '';
 
+    // 1. Render Git Sections
     gitData.forEach((section, index) => {
-        // Sidebar Link
+        // Sidebar
         const li = document.createElement('li');
         const link = document.createElement('a');
         link.href = `#cat-${index}`;
         link.className = 'cat-link';
         link.innerHTML = `<i class="fa-solid ${section.icon}"></i> ${section.category}`;
         
+        // Link click handling (also closes sidebar on mobile)
         link.addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById(`cat-${index}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            closeMobileMenu();
         });
         li.appendChild(link);
         catList.appendChild(li);
 
-        // Main Section
+        // Section
         const sectionEl = document.createElement('div');
         sectionEl.className = 'category-section reveal';
         sectionEl.id = `cat-${index}`;
@@ -143,39 +160,100 @@ function renderContent() {
             const card = document.createElement('div');
             card.className = 'cmd-card';
             
-            // Header
-            const header = document.createElement('div');
-            header.className = 'cmd-header';
+            card.innerHTML = `
+                <div class="cmd-header">
+                    <code class="cmd-code">${item.cmd}</code>
+                    <button class="copy-btn" title="Copy command">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+                <p class="cmd-desc">${item.desc}</p>
+            `;
             
-            const code = document.createElement('code');
-            code.className = 'cmd-code';
-            code.textContent = item.cmd;
-            
-            const btn = document.createElement('button');
-            btn.className = 'copy-btn';
-            btn.title = "Copy command";
-            btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            // Add event listener to the copy button
+            const btn = card.querySelector('.copy-btn');
             btn.addEventListener('click', () => copyToClipboard(item.cmd, btn));
 
-            header.appendChild(code);
-            header.appendChild(btn);
-            
-            // Description
-            const desc = document.createElement('p');
-            desc.className = 'cmd-desc';
-            desc.textContent = item.desc;
-
-            card.appendChild(header);
-            card.appendChild(desc);
             cardsDiv.appendChild(card);
         });
 
         sectionEl.appendChild(cardsDiv);
+
+        // Troubleshooting Box
+        if (section.troubleshooting) {
+            const troubleBox = document.createElement('div');
+            troubleBox.className = 'trouble-box';
+            
+            let rows = '';
+            section.troubleshooting.forEach(row => {
+                rows += `<tr><td>${row.problem}</td><td><code>${row.fix}</code></td></tr>`;
+            });
+
+            troubleBox.innerHTML = `
+                <div class="trouble-header"><i class="fa-solid fa-triangle-exclamation"></i> Troubleshooting</div>
+                <table class="trouble-table">
+                    <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+            sectionEl.appendChild(troubleBox);
+        }
+
         grid.appendChild(sectionEl);
     });
+
+    // 2. Render About Section
+    renderAboutSection(grid);
 }
 
-// --- 3. Scroll Reveal ---
+function renderAboutSection(container) {
+    const aboutDiv = document.createElement('div');
+    aboutDiv.className = 'category-section reveal about-container';
+    aboutDiv.innerHTML = `
+        <h2 class="category-title"><i class="fa-solid fa-user-astronaut"></i> About the Creator</h2>
+        <div class="about-card">
+            <div class="about-content">
+                <div class="about-header">
+                    <h3>Ayush Roy</h3>
+                    <span class="role-badge">Developer & Engineer</span>
+                </div>
+                <p class="about-text">
+                    Hi, I’m Ayush Roy. I enjoy building clean, practical tools for modern developers.<br>
+                    This project is my attempt to make Git simpler, faster and more accessible especially for beginners.
+                </p>
+                <div class="about-actions">
+                    <a href="https://www.linkedin.com/in/ayush-roy-206309321" target="_blank" class="btn btn-primary">
+                        <i class="fa-brands fa-linkedin"></i> Connect on LinkedIn
+                    </a>
+                    <a href="mailto:ayushroy21205@gmail.com" class="btn btn-secondary" id="emailBtn">
+                        <i class="fa-solid fa-envelope"></i> Send Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    container.appendChild(aboutDiv);
+
+    // --- Add Smart Copy Functionality to Email Button ---
+    const emailBtn = aboutDiv.querySelector('#emailBtn');
+    if (emailBtn) {
+        emailBtn.addEventListener('click', (e) => {
+            const email = "ayushroy21205@gmail.com";
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    const originalHTML = emailBtn.innerHTML;
+                    emailBtn.innerHTML = '<i class="fa-solid fa-check"></i> Email Copied!';
+                    setTimeout(() => {
+                        emailBtn.innerHTML = originalHTML;
+                    }, 2500);
+                });
+            }
+        });
+    }
+}
+
+// --- Scroll Reveal ---
 function setupScrollReveal() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -185,57 +263,63 @@ function setupScrollReveal() {
         });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }, 100);
 }
 
-// --- 4. Interactions ---
-
+// --- Interactions ---
 function copyToClipboard(text, btn) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            animateCheck(btn);
-        });
-    } else {
-        // Fallback
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-        animateCheck(btn);
-    }
+    navigator.clipboard.writeText(text).then(() => {
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--accent-success)"></i>';
+        setTimeout(() => btn.innerHTML = original, 2000);
+    });
 }
 
-function animateCheck(btn) {
-    const original = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--accent-success)"></i>';
-    setTimeout(() => btn.innerHTML = original, 2000);
+// --- Mobile Menu Functions ---
+function openMobileMenu() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('active');
+}
+
+function closeMobileMenu() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
 }
 
 function setupInteractions() {
-    // Search
     const searchInput = document.getElementById('searchInput');
+    const themeBtn = document.getElementById('themeToggle');
+    const scrollBtn = document.getElementById('scrollTopBtn');
     
-    // Keyboard Shortcut (/)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === '/' && document.activeElement !== searchInput) {
-            e.preventDefault();
-            searchInput.focus();
-        }
-    });
+    // Mobile Menu Controls
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const overlay = document.getElementById('sidebarOverlay');
 
+    if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+    if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeMobileMenu);
+    if(overlay) overlay.addEventListener('click', closeMobileMenu);
+
+    // Search
     if(searchInput) {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const cards = document.querySelectorAll('.cmd-card');
-            const sections = document.querySelectorAll('.category-section');
+            const sections = document.querySelectorAll('.category-section:not(.about-container)'); 
 
             cards.forEach(card => {
                 const cmd = card.querySelector('.cmd-code').textContent.toLowerCase();
                 const desc = card.querySelector('.cmd-desc').textContent.toLowerCase();
                 const isMatch = cmd.includes(term) || desc.includes(term);
-                
                 card.style.display = isMatch ? 'block' : 'none';
             });
 
@@ -246,44 +330,36 @@ function setupInteractions() {
         });
     }
 
-    // Theme Toggle
-    const themeBtn = document.getElementById('themeToggle');
+    // Theme Toggle (Default Dark -> Toggle Light)
     if(themeBtn) {
         themeBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-theme');
             const icon = themeBtn.querySelector('i');
-            
-            // Spin animation
             themeBtn.style.transform = 'rotate(180deg)';
             setTimeout(() => themeBtn.style.transform = 'rotate(0deg)', 300);
 
             if (document.body.classList.contains('light-theme')) {
-                icon.className = 'fa-solid fa-moon';
+                icon.className = 'fa-solid fa-moon'; // Show moon when in light mode (to switch back)
             } else {
-                icon.className = 'fa-solid fa-sun';
+                icon.className = 'fa-solid fa-sun'; // Show sun when in dark mode
             }
         });
     }
 
-    // Scroll to Top & Sidebar Highlight
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    
-    window.addEventListener('scroll', () => {
-        // Progress Bar
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const bar = document.querySelector('.scroll-bar');
-        if(bar) bar.style.width = (winScroll / height) * 100 + "%";
-
-        // Button Visibility
-        if (winScroll > 400) scrollBtn.classList.add('visible');
-        else scrollBtn.classList.remove('visible');
-
-        // Sidebar Active State
-        highlightSidebar();
-    });
-
+    // Scroll Top
     if(scrollBtn) {
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const bar = document.querySelector('.scroll-bar');
+            if(bar) bar.style.width = (winScroll / height) * 100 + "%";
+
+            if (winScroll > 400) scrollBtn.classList.add('visible');
+            else scrollBtn.classList.remove('visible');
+
+            highlightSidebar();
+        });
+
         scrollBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
