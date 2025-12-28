@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git-Archive | Professional Developer Reference</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <div id="loader">
+        <div class="loader-content">
+            <i class="fa-brands fa-git-alt fa-bounce"></i>
+            <span class="loading-text">Loading Repository...</span>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+    </div>
+
+    <div class="ambient-light one"></div>
+    <div class="ambient-light two"></div>
+    <div class="bg-grid"></div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fa-brands fa-git-alt"></i></div>
+            <div class="logo-text">Git-<span>Archive</span></div>
+        </div>
+        <div class="nav-controls">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search commands..." autocomplete="off">
+                <span class="search-shortcut">/</span>
+            </div>
+            <button id="themeToggle" class="icon-btn" aria-label="Toggle Theme">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">Reference Manual</div>
+            <h1 class="hero-title">
+                <span class="gradient-text">Master Version Control</span>
+            </h1>
+            <p class="subtitle">The definitive, curated collection of Git commands for modern engineering.</p>
+            
+            <div class="hero-stats-container">
+                <div class="stat-item">
+                    <span class="stat-num">20+</span>
+                    <span class="stat-label">Categories</span>
+                </div>
+                <div class="divider"></div>
+                <div class="stat-item">
+                    <span class="stat-num">100+</span>
+                    <span class="stat-label">Commands</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">CONTENTS</div>
+            <ul id="categoryList">
+                </ul>
+        </aside>
+
+        <section class="content-area" id="commandGrid">
+            </section>
+    </main>
+
+    <div class="scroll-track">
+        <div class="scroll-bar"></div>
+    </div>
+
+    <button id="scrollTopBtn" aria-label="Scroll to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <footer>
+        <p>Handcrafted for Developers &bull; Git-Archive &copy; 2025</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
