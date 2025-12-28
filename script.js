@@ -13,7 +13,7 @@ const gitData = [
         ]
     },
     {
-        category: "🚀 How to Send Project to GitHub",
+        category: "How to Send Project to GitHub",
         icon: "fa-rocket",
         commands: [
             { cmd: 'git init', desc: "Creates a new Git repository" },
